@@ -1,7 +1,17 @@
 [
     {
+        "id": "initial-plan",
+        "name": "Initial Plan (1F)",
+        "file": "plans/initial_plan.json"
+    },
+    {
+        "id": "plan-2f",
+        "name": "Initial Plan (2F)",
+        "file": "plans/plan_2f.json"
+    },
+    {
         "id": "sample-01",
-        "name": "One Room (6MB)",
+        "name": "One Room Sample",
         "file": "plans/sample_plan.json"
     }
 ]

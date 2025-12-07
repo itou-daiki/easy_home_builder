@@ -1,0 +1,210 @@
+{
+    "walls": [
+        {
+            "start": {
+                "x": 0,
+                "y": 0
+            },
+            "end": {
+                "x": 819,
+                "y": 0
+            }
+        },
+        {
+            "start": {
+                "x": 819,
+                "y": 0
+            },
+            "end": {
+                "x": 819,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 819,
+                "y": 455
+            },
+            "end": {
+                "x": 637,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 637,
+                "y": 455
+            },
+            "end": {
+                "x": 637,
+                "y": 637
+            }
+        },
+        {
+            "start": {
+                "x": 637,
+                "y": 637
+            },
+            "end": {
+                "x": 455,
+                "y": 637
+            }
+        },
+        {
+            "start": {
+                "x": 455,
+                "y": 637
+            },
+            "end": {
+                "x": 455,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 455,
+                "y": 455
+            },
+            "end": {
+                "x": 0,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 0,
+                "y": 455
+            },
+            "end": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "start": {
+                "x": 364,
+                "y": 0
+            },
+            "end": {
+                "x": 364,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 455,
+                "y": 0
+            },
+            "end": {
+                "x": 455,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 546,
+                "y": 0
+            },
+            "end": {
+                "x": 546,
+                "y": 182
+            }
+        },
+        {
+            "start": {
+                "x": 546,
+                "y": 182
+            },
+            "end": {
+                "x": 819,
+                "y": 182
+            }
+        },
+        {
+            "start": {
+                "x": 364,
+                "y": 273
+            },
+            "end": {
+                "x": 455,
+                "y": 273
+            }
+        }
+    ],
+    "openings": [
+        {
+            "type": "window",
+            "wallIndex": 0,
+            "dist": 182,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 0,
+            "dist": 680,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 7,
+            "dist": 227,
+            "width": 160
+        },
+        {
+            "type": "door",
+            "wallIndex": 8,
+            "dist": 136,
+            "width": 80
+        },
+        {
+            "type": "door",
+            "wallIndex": 8,
+            "dist": 319,
+            "width": 80
+        },
+        {
+            "type": "door",
+            "wallIndex": 9,
+            "dist": 319,
+            "width": 80
+        }
+    ],
+    "furniture": [
+        {
+            "type": "stairs",
+            "x": 455,
+            "y": 91,
+            "width": 91,
+            "depth": 182,
+            "rotation": 0,
+            "color": "#e0e0e0"
+        },
+        {
+            "type": "bed",
+            "x": 100,
+            "y": 100,
+            "width": 100,
+            "depth": 200,
+            "rotation": 90,
+            "color": "#3366cc"
+        },
+        {
+            "type": "bed",
+            "x": 100,
+            "y": 300,
+            "width": 100,
+            "depth": 200,
+            "rotation": 90,
+            "color": "#3366cc"
+        },
+        {
+            "type": "toilet",
+            "x": 409,
+            "y": 319,
+            "width": 40,
+            "depth": 70,
+            "rotation": 0,
+            "color": "#ffffff"
+        }
+    ]
+}

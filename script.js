@@ -134,7 +134,8 @@ class Editor2D {
         if (this.currentMod === 'furniture' && this.activeFurnitureType) {
             this.drawGhostFurniture();
         } else if (this.currentMod === 'opening') {
-            // Draw ghost opening
+            // Highlight wall under cursor?
+            this.drawGhostOpening();
         }
 
         this.ctx.restore();
@@ -343,6 +344,26 @@ class Editor2D {
                 color: dims.color
             });
             this.draw();
+        } else if (this.currentMod === 'opening') {
+            const wallInfo = this.findWallAt(worldPos.x, worldPos.y);
+            if (wallInfo) {
+                let openingWidth;
+                if (this.activeFurnitureType === 'door') {
+                    openingWidth = 80; // Example door width
+                } else if (this.activeFurnitureType === 'window') {
+                    openingWidth = 160; // Example window width
+                } else {
+                    openingWidth = 100; // Default
+                }
+
+                this.floorPlan.openings.push({
+                    type: this.activeFurnitureType,
+                    wallIndex: wallInfo.index,
+                    dist: wallInfo.dist,
+                    width: openingWidth
+                });
+                this.draw();
+            }
         }
     }
 
@@ -354,6 +375,8 @@ class Editor2D {
         if (this.isDrawing) {
             this.draw();
         } else if (this.currentMod === 'furniture') {
+            this.draw();
+        } else if (this.currentMod === 'opening') {
             this.draw();
         } else if (this.currentMod === 'select' && this.isDragging && this.selectedFurniture) {
             // Drag logic
@@ -393,7 +416,94 @@ class Editor2D {
         // Let's use simple distance from center <= radius approx
         for (let i = this.floorPlan.furniture.length - 1; i >= 0; i--) {
             const item = this.floorPlan.furniture[i];
-            // Radius approx = max(width, depth) / 2
+            // Radius approx = max(item.width, item.depth) / 2
+            const radius = Math.max(item.width, item.depth) / 2;
+            const dist = Math.sqrt((x - item.x) ** 2 + (y - item.y) ** 2);
+            if (dist <= radius) {
+                return item;
+            }
+        }
+        return null; // None found
+    }
+
+    findWallAt(x, y) {
+        const threshold = 20; // Distance to snap to wall
+        let best = null;
+        let minD = Infinity;
+
+        this.floorPlan.walls.forEach((wall, idx) => {
+            // Distance from point to segment
+            const A = x - wall.start.x;
+            const B = y - wall.start.y;
+            const C = wall.end.x - wall.start.x;
+            const D = wall.end.y - wall.start.y;
+
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let param = -1;
+            if (lenSq !== 0) param = dot / lenSq;
+
+            let xx, yy;
+
+            if (param < 0) {
+                xx = wall.start.x;
+                yy = wall.start.y;
+                param = 0;
+            } else if (param > 1) {
+                xx = wall.end.x;
+                yy = wall.end.y;
+                param = 1;
+            } else {
+                xx = wall.start.x + param * C;
+                yy = wall.start.y + param * D;
+            }
+
+            const dx = x - xx;
+            const dy = y - yy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < threshold && dist < minD) {
+                minD = dist;
+                // Calculate distance along wall from start
+                // param is 0..1 ratio
+                const wallLen = Math.sqrt(lenSq);
+                best = {
+                    index: idx,
+                    dist: param * wallLen
+                };
+            }
+        });
+        return best;
+    }
+
+    drawGhostOpening() {
+        // Draw invalid/valid indicator
+        const wallInfo = this.findWallAt(this.currentMousePos.x, this.currentMousePos.y);
+
+        this.ctx.save();
+        this.ctx.translate(this.currentMousePos.x, this.currentMousePos.y);
+
+        if (wallInfo) {
+            this.ctx.fillStyle = this.activeFurnitureType === 'door' ? 'rgba(0, 255, 0, 0.5)' : 'rgba(0, 0, 255, 0.5)';
+            const w = this.activeFurnitureType === 'door' ? 80 : 160;
+            this.ctx.fillRect(-w / 2, -5, w, 10);
+        } else {
+            this.ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.restore();
+    }
+
+    // Helper Methods
+    findFurnitureAt(x, y) {
+        // Simple bounding box check (ignoring rotation for simplicity in hit test, 
+        // or check distance to center if we want easy rotation support)
+        // Let's use simple distance from center <= radius approx
+        for (let i = this.floorPlan.furniture.length - 1; i >= 0; i--) {
+            const item = this.floorPlan.furniture[i];
+            // Radius approx = max(item.width, item.depth) / 2
             const radius = Math.max(item.width, item.depth) / 2;
             const dist = Math.sqrt((x - item.x) ** 2 + (y - item.y) ** 2);
             if (dist <= radius) {
@@ -723,6 +833,15 @@ class App {
             this.exportProject();
         });
 
+        // Opening Buttons
+        document.querySelectorAll('.opening-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.setActiveTool('opening', btn);
+                const type = btn.dataset.type;
+                this.editor.setMode('opening', type);
+            });
+        });
+
         // Furniture Buttons
         document.querySelectorAll('.furniture-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -737,6 +856,7 @@ class App {
         // Reset active classes
         document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.furniture-item').forEach(b => b.classList.remove('active-furniture')); // Add this class to CSS if needed
+        document.querySelectorAll('.opening-btn').forEach(b => b.classList.remove('active'));
 
         if (tool === 'wall') {
             document.getElementById('tool-wall').classList.add('active');
@@ -744,6 +864,8 @@ class App {
             document.getElementById('tool-select').classList.add('active');
         } else if (tool === 'delete') { // Visual feedback only usually
             // document.getElementById('tool-delete').classList.add('active');
+        } else if (tool === 'opening' && element) {
+            element.classList.add('active');
         } else if (tool === 'furniture' && element) {
             // Optional: highlight selected furniture
             // element.classList.add('active-furniture'); 
