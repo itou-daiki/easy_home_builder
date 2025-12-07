@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Styles (if any, migrated from style.css) */
+/* Canvas needs to be block */
+canvas {
+    display: block;
+}
+
+/* Custom Active State for Tool Buttons (overrides utility classes) */
+.tool-btn.active,
+.opening-btn.active,
+.furniture-item.active-furniture {
+    background-color: #eff6ff !important;
+    /* bg-blue-50 */
+    border-color: #1e90ff !important;
+    /* border-primary */
+    color: #1e90ff !important;
+    /* text-primary */
+}

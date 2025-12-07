@@ -1,0 +1,27 @@
+{
+  "name": "easy_home_builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./src/input.css -o ./style.css",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itou-daiki/easy_home_builder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/itou-daiki/easy_home_builder/issues"
+  },
+  "homepage": "https://github.com/itou-daiki/easy_home_builder#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
+  }
+}
