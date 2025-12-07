@@ -13,7 +13,8 @@ body {
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
     background-color: var(--bg-color);
-    overflow: hidden; /* Prevent scroll on full app */
+    overflow: hidden;
+    /* Prevent scroll on full app */
 }
 
 #app {
@@ -30,7 +31,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     z-index: 10;
 }
 
@@ -62,7 +63,8 @@ body {
     margin-bottom: 20px;
 }
 
-.tool-btn, .mode-btn {
+.tool-btn,
+.mode-btn {
     flex: 1;
     padding: 8px 12px;
     border: 1px solid var(--border-color);
@@ -73,12 +75,14 @@ body {
     transition: all 0.2s;
 }
 
-.tool-btn:hover, .mode-btn:hover {
+.tool-btn:hover,
+.mode-btn:hover {
     background: #f9fafb;
     border-color: #d1d5db;
 }
 
-.tool-btn.active, .mode-btn.active {
+.tool-btn.active,
+.mode-btn.active {
     background: var(--accent-color);
     color: white;
     border-color: var(--accent-color);
@@ -125,15 +129,40 @@ body {
     margin: 5px 0 0;
 }
 
+/* Action Buttons */
+.action-group {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 6px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-color);
+}
+
+.action-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
 /* Workspace */
 #workspace {
     flex: 1;
     position: relative;
-    background: #e5e5e5; /* Canvas bg */
+    background: #e5e5e5;
+    /* Canvas bg */
     overflow: hidden;
 }
 
-#container-2d, #container-3d {
+#container-2d,
+#container-3d {
     width: 100%;
     height: 100%;
     position: absolute;

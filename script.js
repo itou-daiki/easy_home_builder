@@ -31,6 +31,11 @@ class Editor2D {
         this.startPoint = null;
         this.currentMousePos = { x: 0, y: 0 };
 
+        // Selection State
+        this.selectedFurniture = null;
+        this.isDragging = false;
+        this.dragOffset = { x: 0, y: 0 };
+
         // Transform (Pan/Zoom) - Simple implementation
         this.offsetX = 0;
         this.offsetY = 0;
@@ -51,6 +56,9 @@ class Editor2D {
     setMode(mode, type = null) {
         this.currentMod = mode;
         this.activeFurnitureType = type;
+        // Clear selection when changing mode
+        this.selectedFurniture = null;
+        this.draw();
     }
 
     resize() {
@@ -106,6 +114,11 @@ class Editor2D {
         this.drawGrid();
         this.drawWalls();
         this.drawFurniture();
+
+        // Highlight selection
+        if (this.selectedFurniture) {
+            this.drawSelection(this.selectedFurniture);
+        }
 
         // Draw temporary wall if drawing
         if (this.isDrawing && this.startPoint) {
@@ -239,11 +252,25 @@ class Editor2D {
                 x: this.snapToGrid(worldPos.x),
                 y: this.snapToGrid(worldPos.y)
             };
+            // Clear selection when drawing
+            this.selectedFurniture = null;
+            this.draw();
+
         } else if (this.currentMod === 'select') {
-            // Check furniture selection (simple hit test)
-            // Note: rotation makes hit test harder, approximating with bounding circle for now for speed
-            // Or just direct box check if rotation is 0
-            // ... Logic for selection
+            // Check furniture selection
+            const item = this.findFurnitureAt(worldPos.x, worldPos.y);
+            if (item) {
+                this.selectedFurniture = item;
+                this.isDragging = true;
+                this.dragOffset = {
+                    x: worldPos.x - item.x,
+                    y: worldPos.y - item.y
+                };
+                this.draw();
+            } else {
+                this.selectedFurniture = null;
+                this.draw();
+            }
         } else if (this.currentMod === 'furniture') {
             // Place furniture
             const snapX = this.snapToGrid(worldPos.x);
@@ -268,12 +295,24 @@ class Editor2D {
         const worldPos = this.screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
         this.currentMousePos = worldPos;
 
-        if (this.isDrawing || this.currentMod === 'furniture') {
-            this.draw(); // Redraw for temp wall or ghost furniture
+        if (this.isDrawing) {
+            this.draw();
+        } else if (this.currentMod === 'furniture') {
+            this.draw();
+        } else if (this.currentMod === 'select' && this.isDragging && this.selectedFurniture) {
+            // Drag logic
+            const snapX = this.snapToGrid(worldPos.x - this.dragOffset.x);
+            const snapY = this.snapToGrid(worldPos.y - this.dragOffset.y);
+
+            this.selectedFurniture.x = snapX;
+            this.selectedFurniture.y = snapY;
+            this.draw();
         }
     }
 
     handleMouseUp(e) {
+        this.isDragging = false; // Stop dragging
+
         if (this.isDrawing && this.currentMod === 'wall') {
             const snapX = this.snapToGrid(this.currentMousePos.x);
             const snapY = this.snapToGrid(this.currentMousePos.y);
@@ -288,6 +327,48 @@ class Editor2D {
             this.isDrawing = false;
             this.startPoint = null;
             this.draw();
+        }
+    }
+
+    // Helper Methods
+    findFurnitureAt(x, y) {
+        // Simple bounding box check (ignoring rotation for simplicity in hit test, 
+        // or check distance to center if we want easy rotation support)
+        // Let's use simple distance from center <= radius approx
+        for (let i = this.floorPlan.furniture.length - 1; i >= 0; i--) {
+            const item = this.floorPlan.furniture[i];
+            // Radius approx = max(width, depth) / 2
+            const radius = Math.max(item.width, item.depth) / 2;
+            const dist = Math.sqrt((x - item.x) ** 2 + (y - item.y) ** 2);
+            if (dist <= radius) {
+                return item;
+            }
+        }
+        return null; // None found
+    }
+
+    drawSelection(item) {
+        this.ctx.save();
+        this.ctx.translate(item.x, item.y);
+        this.ctx.rotate((item.rotation * Math.PI) / 180);
+
+        this.ctx.strokeStyle = '#2563eb'; // Blue highlight
+        this.ctx.lineWidth = 2;
+        // Draw slightly larger box
+        const pad = 5;
+        this.ctx.strokeRect(-(item.width / 2) - pad, -(item.depth / 2) - pad, item.width + pad * 2, item.depth + pad * 2);
+
+        this.ctx.restore();
+    }
+
+    deleteSelected() {
+        if (this.selectedFurniture) {
+            const index = this.floorPlan.furniture.indexOf(this.selectedFurniture);
+            if (index > -1) {
+                this.floorPlan.furniture.splice(index, 1);
+                this.selectedFurniture = null;
+                this.draw();
+            }
         }
     }
 }
@@ -520,6 +601,14 @@ class App {
             this.editor.setMode('select');
         });
 
+        document.getElementById('tool-delete').addEventListener('click', () => {
+            this.editor.deleteSelected();
+        });
+
+        document.getElementById('btn-export').addEventListener('click', () => {
+            this.exportProject();
+        });
+
         // Furniture Buttons
         document.querySelectorAll('.furniture-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -539,10 +628,25 @@ class App {
             document.getElementById('tool-wall').classList.add('active');
         } else if (tool === 'select') {
             document.getElementById('tool-select').classList.add('active');
+        } else if (tool === 'delete') { // Visual feedback only usually
+            // document.getElementById('tool-delete').classList.add('active');
         } else if (tool === 'furniture' && element) {
             // Optional: highlight selected furniture
             // element.classList.add('active-furniture'); 
         }
+    }
+
+    exportProject() {
+        const data = JSON.stringify(this.floorPlan, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'floor_plan.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     async loadProject(file) {
