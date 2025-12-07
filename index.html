@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Home Builder</title>
-    <!-- Font for better UI -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Three.js CDN -->
     <script type="importmap">
         {
@@ -18,80 +16,215 @@
             }
         }
     </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e90ff',
+                        'primary-dark': '#1c86ee',
+                        'primary-light': '#4da6ff',
+                        surface: '#ffffff',
+                        background: '#f3f4f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Tooltip animation */
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        *:hover > .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Active state for custom classes if handled by JS manually or utility */
+        .btn-active {
+            background-color: #1e90ff !important;
+            color: white !important;
+            border-color: #1e90ff !important;
+        }
+    </style>
 </head>
+<body class="bg-background text-slate-800 h-screen w-screen overflow-hidden flex font-sans">
 
-<body>
-    <div id="app">
-        <!-- Sidebar -->
-        <aside id="sidebar">
-            <h1>Home Builder</h1>
-
-            <section id="project-section">
-                <h2>Projects</h2>
-                <select id="project-select">
-                    <option value="" disabled selected>Select a project...</option>
-                </select>
-                <div class="action-group">
-                    <button id="btn-export" class="action-btn">💾 Export JSON</button>
-                    <!-- <button id="btn-import">📂 Import</button> -->
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-80 bg-surface h-full flex flex-col border-r border-slate-200 shadow-lg z-10 transition-transform duration-300">
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-primary flex items-center gap-2">
+                <span class="text-2xl">🏠</span> Home Builder
+            </h1>
+        </div>
+        
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+            
+            <!-- Project Section -->
+            <section id="project-section" class="space-y-3">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Project</h2>
+                <div class="space-y-2">
+                    <select id="project-select" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer hover:border-slate-300">
+                        <option value="" disabled selected>Select a project...</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button id="btn-export" class="flex-1 py-1.5 px-3 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary hover:border-primary transition-colors flex items-center justify-center gap-2">
+                            <span>💾</span> Export
+                        </button>
+                    </div>
                 </div>
             </section>
 
-            <section id="tools-section">
-                <h2>Tools</h2>
-                <div class="tool-group">
-                    <button id="tool-wall" class="tool-btn active" title="Draw walls">📏 Wall</button>
-                    <button id="tool-select" class="tool-btn" title="Select/Move">👆 Select</button>
-                    <button id="tool-delete" class="tool-btn" title="Delete Selected">🗑️ Delete</button>
+            <!-- Tools Section -->
+            <section id="tools-section" class="space-y-3">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tools</h2>
+                
+                <!-- Main Actions -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="tool-wall" class="tool-btn btn-active flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all text-sm font-medium text-slate-600 gap-1">
+                        <span class="text-lg">📏</span>
+                        <span class="text-xs">Wall</span>
+                    </button>
+                    <button id="tool-select" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all text-sm font-medium text-slate-600 gap-1">
+                        <span class="text-lg">👆</span>
+                        <span class="text-xs">Select</span>
+                    </button>
+                    <button id="tool-delete" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-all text-sm font-medium text-slate-600 gap-1">
+                        <span class="text-lg">🗑️</span>
+                        <span class="text-xs">Delete</span>
+                    </button>
+                </div>
+                
+                <!-- Openings -->
+                <div class="pt-2">
+                    <h3 class="text-xs font-semibold text-slate-500 mb-2 px-1">Openings</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="opening-btn tool-btn w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2" data-type="door">
+                            <span>🚪</span> Door
+                        </button>
+                        <button class="opening-btn tool-btn w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2" data-type="window">
+                            <span>🪟</span> Window
+                        </button>
+                    </div>
                 </div>
 
-                <h3>Openings</h3>
-                <div class="tool-group">
-                    <button class="opening-btn tool-btn" data-type="door">🚪 Door</button>
-                    <button class="opening-btn tool-btn" data-type="window">🪟 Window</button>
-                    <!-- <button class="opening-btn tool-btn" data-type="sliding">↔️ Sliding</button> -->
-                </div>
-
-                <h3>Furniture</h3>
-                <div id="furniture-list">
-                    <button class="furniture-item" data-type="bed">🛏️ Bed</button>
-                    <button class="furniture-item" data-type="table">🪑 Table</button>
-                    <button class="furniture-item" data-type="sofa">🛋️ Sofa</button>
-                    <button class="furniture-item" data-type="stairs">🪜 Stairs</button>
-                    <button class="furniture-item" data-type="kitchen">🍳 Kitchen</button>
-                    <button class="furniture-item" data-type="bath">🛁 Bath</button>
-                    <button class="furniture-item" data-type="toilet">🚽 Toilet</button>
+                <!-- Furniture -->
+                <div class="pt-2">
+                    <h3 class="text-xs font-semibold text-slate-500 mb-2 px-1">Furniture</h3>
+                    <div id="furniture-list" class="grid grid-cols-1 gap-2">
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="bed">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🛏️</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Bed</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="table">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🪑</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Table</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="sofa">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🛋️</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Sofa</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="stairs">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🪜</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Stairs</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="kitchen">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🍳</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Kitchen</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="bath">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🛁</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Bath</span>
+                        </button>
+                        <button class="furniture-item w-full py-2 px-3 bg-white border border-slate-200 rounded-md text-sm text-left flex items-center gap-3 hover:bg-slate-50 hover:border-primary transition-all group" data-type="toilet">
+                            <span class="text-lg group-hover:scale-110 transition-transform">🚽</span>
+                            <span class="font-medium text-slate-600 group-hover:text-slate-800">Toilet</span>
+                        </button>
+                    </div>
                 </div>
             </section>
+        </div>
 
-            <section id="controls-section">
-                <h2>View Mode</h2>
-                <div class="toggle-container">
-                    <button id="mode-2d" class="mode-btn active">2D Plan</button>
-                    <button id="mode-3d" class="mode-btn">3D View</button>
-                </div>
-            </section>
-
-            <div class="help-text">
-                <p><strong>Tips:</strong></p>
-                <ul id="help-list">
+        <!-- Help Footer -->
+        <div class="p-4 bg-slate-50 border-t border-slate-200">
+            <div class="text-xs text-slate-500">
+                <p class="font-semibold mb-1">Tips:</p>
+                <ul class="list-disc pl-4 space-y-0.5">
                     <li>Click points to draw walls.</li>
                     <li>Drag furniture to place.</li>
+                    <li>Click furniture to select/move.</li>
                 </ul>
             </div>
-        </aside>
+        </div>
+    </aside>
 
-        <!-- Main Workspace -->
-        <main id="workspace">
-            <div id="container-2d">
-                <canvas id="canvas-2d"></canvas>
+    <!-- Main Workspace -->
+    <main id="workspace" class="flex-1 relative bg-slate-100 flex flex-col h-full overflow-hidden">
+        
+        <!-- Top Control Bar -->
+        <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-lg border border-slate-200 flex gap-1">
+             <button id="mode-2d" class="mode-btn btn-active px-6 py-2 rounded-full text-sm font-semibold transition-all hover:bg-slate-100">2D Plan</button>
+             <button id="mode-3d" class="mode-btn px-6 py-2 rounded-full text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100">3D View</button>
+        </div>
+
+        <!-- Canvases -->
+        <div class="relative w-full h-full">
+            <div id="container-2d" class="w-full h-full absolute top-0 left-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+                <canvas id="canvas-2d" class="block w-full h-full cursor-crosshair"></canvas>
             </div>
-            <div id="container-3d" style="display: none;"></div>
-        </main>
-    </div>
+            <div id="container-3d" class="w-full h-full absolute top-0 left-0 hidden bg-gradient-to-b from-blue-50 to-white"></div>
+        </div>
+        
+    </main>
 
     <!-- Main Logic -->
     <script type="module" src="script.js"></script>
+    <script>
+        // JS logic to toggle active classes needs to match CSS classes
+        // The script.js uses "active" class. We need to ensure that works or update script.js.
+        // Tailwind "btn-active" helper class we added uses active state.
+        // We will stick to "active" class in JS and handle it via our custom style block helper for .btn-active
+        // that applies !important styles, effectively overriding tailwind utilities.
+        
+        // Wait, "tool-btn active" in script.js adds the class "active". 
+        // We added a custom style: .btn-active.
+        // We need to make sure script.js toggles "btn-active" or we map "active" to the same styles.
+        // Let's modify script.js to use "btn-active" OR map .active in CSS.
+        // Currently style block has .btn-active. Let's add .active there too.
+    </script>
+    <style>
+        .active {
+            background-color: #1e90ff !important;
+            color: white !important;
+            border-color: #1e90ff !important;
+        }
+    </style>
 </body>
-
 </html>
