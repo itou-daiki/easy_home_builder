@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // --- Configuration Constants ---
-const GRID_SIZE = 20; // cm pixels
+const GRID_SIZE = 45.5; // cm pixels (910mm module / 2)
 const WALL_THICKNESS = 10;
 const WALL_HEIGHT = 240; // cm
 
@@ -10,12 +10,16 @@ const WALL_HEIGHT = 240; // cm
 class FloorPlan {
     constructor() {
         this.walls = [];
-        this.furniture = [];
+        this.furniture = []; // Includes stairs, fixed furniture
+        this.openings = []; // { type: 'door'|'window', wallIndex: number, dist: number, width: number }
+        this.labels = [];
     }
 
     load(data) {
         this.walls = data.walls || [];
         this.furniture = data.furniture || [];
+        this.openings = data.openings || [];
+        this.labels = data.labels || [];
     }
 }
 
@@ -113,6 +117,7 @@ class Editor2D {
 
         this.drawGrid();
         this.drawWalls();
+        this.drawOpenings();
         this.drawFurniture();
 
         // Highlight selection
@@ -128,6 +133,8 @@ class Editor2D {
         // Draw ghost furniture if in furniture mode
         if (this.currentMod === 'furniture' && this.activeFurnitureType) {
             this.drawGhostFurniture();
+        } else if (this.currentMod === 'opening') {
+            // Draw ghost opening
         }
 
         this.ctx.restore();
@@ -139,6 +146,10 @@ class Editor2D {
             case 'bed': return { width: 100, depth: 200, color: '#3366cc' };
             case 'table': return { width: 120, depth: 80, color: '#8b4513' };
             case 'sofa': return { width: 200, depth: 90, color: '#555555' };
+            case 'stairs': return { width: 91, depth: 182, color: '#e0e0e0', label: 'UP' }; // Typical U-turn or straight
+            case 'kitchen': return { width: 255, depth: 65, color: '#cccccc' };
+            case 'bath': return { width: 160, depth: 160, color: '#a0aec0' };
+            case 'toilet': return { width: 40, depth: 70, color: '#ffffff' };
             default: return { width: 50, depth: 50, color: '#cccccc' };
         }
     }
@@ -223,6 +234,51 @@ class Editor2D {
             this.ctx.lineTo(-5, -item.depth / 2 + 10);
             this.ctx.lineTo(5, -item.depth / 2 + 10);
             this.ctx.fill();
+
+            this.ctx.restore();
+        });
+    }
+
+    drawOpenings() {
+        // Draw openings on top of walls
+        this.floorPlan.openings.forEach(op => {
+            const wall = this.floorPlan.walls[op.wallIndex];
+            if (!wall) return;
+
+            // Calculate position
+            const dx = wall.end.x - wall.start.x;
+            const dy = wall.end.y - wall.start.y;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+
+            // Position along wall
+            const ratio = op.dist / len;
+            const cx = wall.start.x + dx * ratio;
+            const cy = wall.start.y + dy * ratio;
+
+            this.ctx.save();
+            this.ctx.translate(cx, cy);
+            this.ctx.rotate(angle);
+
+            // Clear wall segment (white rect over wall)
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillRect(-op.width / 2, -WALL_THICKNESS / 2 - 1, op.width, WALL_THICKNESS + 2);
+
+            // Draw symbol
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = '#000000';
+
+            if (op.type === 'door') {
+                // Quarter circle
+                this.ctx.beginPath();
+                this.ctx.moveTo(-op.width / 2, WALL_THICKNESS / 2);
+                this.ctx.lineTo(-op.width / 2, -op.width + WALL_THICKNESS / 2);
+                this.ctx.arc(-op.width / 2, WALL_THICKNESS / 2, op.width, -Math.PI / 2, 0);
+                this.ctx.stroke();
+            } else if (op.type === 'window') {
+                // Double line
+                this.ctx.strokeRect(-op.width / 2, -2, op.width, 4);
+            }
 
             this.ctx.restore();
         });
@@ -430,74 +486,132 @@ class Viewer3D {
         // Remove old objects (keep lights and helper)
         const toRemove = [];
         this.scene.traverse(child => {
-            if (child.isMesh) {
+            if (child.isMesh && child.name !== 'grid') { // Avoid removing grid if it's a mesh, though helper is usually LineSegments
                 toRemove.push(child);
             }
         });
         toRemove.forEach(obj => this.scene.remove(obj));
 
         // Create Walls
-        // Use a group for walls
-        const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xdddddd });
-        const wallGroup = new THREE.Group();
+        const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xe5e7eb });
+        const cutMaterial = new THREE.MeshLambertMaterial({ color: 0xd1d5db }); // Inside cuts
 
-        this.floorPlan.walls.forEach(wall => {
-            this.createWallMesh(wall, wallGroup, wallMaterial);
+        this.floorPlan.walls.forEach((wall, index) => {
+            this.createWallMeshV2(wall, index, wallMaterial);
         });
-        this.scene.add(wallGroup);
 
         // Create Furniture
         this.floorPlan.furniture.forEach(item => {
-            this.createFurnitureMesh(item);
+            if (item.type === 'stairs') {
+                this.createStairsMesh(item);
+            } else {
+                this.createFurnitureMesh(item);
+            }
         });
     }
 
-    createWallMesh(wall, group, material) {
+    createWallMeshV2(wall, index, material) {
         const dx = wall.end.x - wall.start.x;
         const dy = wall.end.y - wall.start.y;
         const len = Math.sqrt(dx * dx + dy * dy);
         const angle = Math.atan2(dy, dx);
-        const cx = (wall.start.x + wall.end.x) / 2;
-        const cy = (wall.start.y + wall.end.y) / 2; // In 2D Y is down, usually? standard cartesian?
-        // In our canvas, usually Y increases downwards, but let's assume standard math for now
-        // Actually canvas and 3D coordinate mapping needs care.
-        // Let's map 2D (x, y) to 3D (x, 0, z) or (x, y, 0).
-        // Standard floor plan: X, Y on ground. Z is height.
-        // Canvas: X right, Y down.
-        // ThreeJS: X right, Y up, Z towards viewer (or usually Y is up for 3D world).
-        // Let's map Canvas X -> 3D X, Canvas Y -> 3D Z.
 
-        const geometry = new THREE.BoxGeometry(len + WALL_THICKNESS, WALL_HEIGHT, WALL_THICKNESS);
+        // Find openings for this wall
+        const openings = this.floorPlan.openings.filter(op => op.wallIndex === index);
+
+        // Create Shape (Face of the wall)
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(len, 0);
+        shape.lineTo(len, WALL_HEIGHT);
+        shape.lineTo(0, WALL_HEIGHT);
+        shape.lineTo(0, 0);
+
+        // Add Holes
+        openings.forEach(op => {
+            const hole = new THREE.Path();
+            const w = op.width;
+            const h = op.type === 'door' ? 200 : 110; // Default heights
+            const y = op.type === 'door' ? 0 : 90; // Default elevation
+
+            // Center of opening is at op.dist
+            const x = op.dist - w / 2;
+
+            hole.moveTo(x, y);
+            hole.lineTo(x + w, y);
+            hole.lineTo(x + w, y + h);
+            hole.lineTo(x, y + h);
+            hole.lineTo(x, y);
+
+            shape.holes.push(hole);
+        });
+
+        const extrudeSettings = {
+            steps: 1,
+            depth: WALL_THICKNESS,
+            bevelEnabled: false
+        };
+
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        // ExtrudeGeometry extrudes along Z. So (x, y) -> (x, y, z).
+        // Wall face is X-Y plane. Thickness is Z.
+        // We need to rotate this to stand up on the floor.
+        // Floor is X-Z. Up is Y.
+        // So we rotate geometry around X axis -90 deg?
+        // Let's keep geometry as is and rotate mesh.
+
         const mesh = new THREE.Mesh(geometry, material);
 
-        // Position
-        mesh.position.set(cx, WALL_HEIGHT / 2, cy);
+        // Pivot adjustments
+        // Default pivot is 0,0,0 of shape.
+        // Wall start is at wall.start.
+        // We need to rotate around Y to match wall angle.
 
-        // Rotation (around Y axis)
-        // Canvas Y is "down" (positive), 3D Z is "back" (positive).
-        // Math.atan2(dy, dx) gives angle from X axis.
-        // If we map Y -> Z, then rotation is around Y axis.
-        // Angle needs to be negated because Z grows "down" in screen space effectively?
-        // Let's try standard angle first.
-        mesh.rotation.y = -angle; // Counter-clockwise in 2D to clockwise in 3D Y-up?
+        mesh.rotation.y = -angle;
+        mesh.position.set(wall.start.x, 0, wall.start.y);
+
+        // Wait, current shape is X=Length, Y=Height. Extrusion=Thickness (Z).
+        // If we place it at 0,0,0 and rotate Y by -angle:
+        // Local X aligns with world direction. Local Y is up. Local Z is thickness perpendicular.
+        // BUT, wall thickness should be centered or offset?
+        // Standard wall line is center.
+        // So we need to offset the mesh by -Thickness/2 along Local Z.
+
+        mesh.translateZ(-WALL_THICKNESS / 2);
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        group.add(mesh);
+        this.scene.add(mesh);
 
-        // Add "posts" at ends to fill gaps? 
-        // For simple Viewer, just overlapping boxes is fine, or simple cylinders at corners.
-        // Let's add cylinders at start/end 
-        const cylGeo = new THREE.CylinderGeometry(WALL_THICKNESS / 2, WALL_THICKNESS / 2, WALL_HEIGHT, 16);
-        const startPost = new THREE.Mesh(cylGeo, material);
-        startPost.position.set(wall.start.x, WALL_HEIGHT / 2, wall.start.y);
-        startPost.castShadow = true;
-        group.add(startPost);
+        // Add frames for openings? (Optional polish)
+    }
 
-        const endPost = new THREE.Mesh(cylGeo, material);
-        endPost.position.set(wall.end.x, WALL_HEIGHT / 2, wall.end.y);
-        endPost.castShadow = true;
-        group.add(endPost);
+    createStairsMesh(item) {
+        // Simple straight stairs for now
+        // U-turn is complex, let's just stack boxes
+        const steps = 14;
+        const stepHeight = 20; // 280cm total
+        const stepDepth = 26;
+        const totalHeight = 280;
+
+        const material = new THREE.MeshLambertMaterial({ color: item.color });
+        const group = new THREE.Group();
+
+        // Assuming straight run for demo
+        for (let i = 0; i < steps; i++) {
+            const w = item.width;
+            const geo = new THREE.BoxGeometry(w, stepHeight, stepDepth);
+            const mesh = new THREE.Mesh(geo, material);
+            // Stack them
+            // Depending on rotation, "Forward" is -Z?
+            // Local coordinates
+            mesh.position.set(0, (i * stepHeight) + stepHeight / 2, -(i * stepDepth));
+            group.add(mesh);
+        }
+
+        group.position.set(item.x, 0, item.y);
+        group.rotation.y = -(item.rotation * Math.PI / 180);
+        this.scene.add(group);
     }
 
     createFurnitureMesh(item) {
