@@ -2,88 +2,28 @@
     "walls": [
         {
             "start": {
-                "x": 0,
-                "y": 0
+                "x": 91,
+                "y": 91
             },
             "end": {
                 "x": 819,
-                "y": 0
-            }
-        },
-        {
-            "start": {
-                "x": 819,
-                "y": 0
-            },
-            "end": {
-                "x": 819,
-                "y": 455
+                "y": 91
             }
         },
         {
             "start": {
                 "x": 819,
-                "y": 455
+                "y": 91
             },
             "end": {
-                "x": 637,
+                "x": 819,
                 "y": 455
             }
         },
         {
             "start": {
-                "x": 637,
+                "x": 819,
                 "y": 455
-            },
-            "end": {
-                "x": 637,
-                "y": 637
-            }
-        },
-        {
-            "start": {
-                "x": 637,
-                "y": 637
-            },
-            "end": {
-                "x": 455,
-                "y": 637
-            }
-        },
-        {
-            "start": {
-                "x": 455,
-                "y": 637
-            },
-            "end": {
-                "x": 455,
-                "y": 455
-            }
-        },
-        {
-            "start": {
-                "x": 455,
-                "y": 455
-            },
-            "end": {
-                "x": 0,
-                "y": 455
-            }
-        },
-        {
-            "start": {
-                "x": 0,
-                "y": 455
-            },
-            "end": {
-                "x": 0,
-                "y": 0
-            }
-        },
-        {
-            "start": {
-                "x": 364,
-                "y": 0
             },
             "end": {
                 "x": 364,
@@ -92,32 +32,42 @@
         },
         {
             "start": {
-                "x": 455,
-                "y": 0
+                "x": 364,
+                "y": 455
             },
             "end": {
-                "x": 455,
+                "x": 364,
+                "y": 91
+            }
+        },
+        {
+            "start": {
+                "x": 91,
+                "y": 91
+            },
+            "end": {
+                "x": 91,
+                "y": 455
+            }
+        },
+        {
+            "start": {
+                "x": 91,
+                "y": 455
+            },
+            "end": {
+                "x": 364,
                 "y": 455
             }
         },
         {
             "start": {
                 "x": 546,
-                "y": 0
+                "y": 91
             },
             "end": {
                 "x": 546,
-                "y": 182
-            }
-        },
-        {
-            "start": {
-                "x": 546,
-                "y": 182
-            },
-            "end": {
-                "x": 819,
-                "y": 182
+                "y": 455
             }
         },
         {
@@ -126,7 +76,17 @@
                 "y": 273
             },
             "end": {
-                "x": 455,
+                "x": 819,
+                "y": 273
+            }
+        },
+        {
+            "start": {
+                "x": 637,
+                "y": 91
+            },
+            "end": {
+                "x": 637,
                 "y": 273
             }
         }
@@ -135,37 +95,49 @@
         {
             "type": "window",
             "wallIndex": 0,
-            "dist": 182,
+            "dist": 136,
             "width": 160
         },
         {
             "type": "window",
             "wallIndex": 0,
-            "dist": 680,
+            "dist": 455,
             "width": 160
         },
         {
             "type": "window",
-            "wallIndex": 7,
-            "dist": 227,
+            "wallIndex": 0,
+            "dist": 682,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 2,
+            "dist": 113,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 2,
+            "dist": 341,
             "width": 160
         },
         {
             "type": "door",
-            "wallIndex": 8,
-            "dist": 136,
+            "wallIndex": 6,
+            "dist": 91,
             "width": 80
         },
         {
             "type": "door",
-            "wallIndex": 8,
-            "dist": 319,
+            "wallIndex": 6,
+            "dist": 273,
             "width": 80
         },
         {
             "type": "door",
-            "wallIndex": 9,
-            "dist": 319,
+            "wallIndex": 7,
+            "dist": 91,
             "width": 80
         }
     ],
@@ -173,7 +145,7 @@
         {
             "type": "stairs",
             "x": 455,
-            "y": 91,
+            "y": 136,
             "width": 91,
             "depth": 182,
             "rotation": 0,
@@ -181,26 +153,35 @@
         },
         {
             "type": "bed",
-            "x": 100,
-            "y": 100,
+            "x": 682,
+            "y": 364,
             "width": 100,
             "depth": 200,
-            "rotation": 90,
+            "rotation": 0,
             "color": "#3366cc"
         },
         {
             "type": "bed",
-            "x": 100,
-            "y": 300,
+            "x": 682,
+            "y": 182,
             "width": 100,
             "depth": 200,
-            "rotation": 90,
+            "rotation": 0,
+            "color": "#3366cc"
+        },
+        {
+            "type": "bed",
+            "x": 455,
+            "y": 364,
+            "width": 100,
+            "depth": 200,
+            "rotation": 0,
             "color": "#3366cc"
         },
         {
             "type": "toilet",
             "x": 409,
-            "y": 319,
+            "y": 136,
             "width": 40,
             "depth": 70,
             "rotation": 0,

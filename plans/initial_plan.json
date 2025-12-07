@@ -2,88 +2,68 @@
     "walls": [
         {
             "start": {
-                "x": 0,
-                "y": 0
+                "x": 91,
+                "y": 91
             },
             "end": {
                 "x": 819,
-                "y": 0
-            }
-        },
-        {
-            "start": {
-                "x": 819,
-                "y": 0
-            },
-            "end": {
-                "x": 819,
-                "y": 637
+                "y": 91
             }
         },
         {
             "start": {
                 "x": 819,
-                "y": 637
+                "y": 91
             },
             "end": {
-                "x": 455,
-                "y": 637
-            }
-        },
-        {
-            "start": {
-                "x": 455,
-                "y": 637
-            },
-            "end": {
-                "x": 455,
-                "y": 728
-            }
-        },
-        {
-            "start": {
-                "x": 455,
-                "y": 728
-            },
-            "end": {
-                "x": 0,
-                "y": 728
-            }
-        },
-        {
-            "start": {
-                "x": 0,
-                "y": 728
-            },
-            "end": {
-                "x": 0,
-                "y": 0
-            }
-        },
-        {
-            "start": {
-                "x": 364,
-                "y": 0
-            },
-            "end": {
-                "x": 364,
+                "x": 819,
                 "y": 455
             }
         },
         {
             "start": {
-                "x": 364,
+                "x": 819,
                 "y": 455
             },
             "end": {
-                "x": 0,
+                "x": 91,
                 "y": 455
             }
         },
         {
             "start": {
-                "x": 364,
+                "x": 91,
                 "y": 455
+            },
+            "end": {
+                "x": 91,
+                "y": 91
+            }
+        },
+        {
+            "start": {
+                "x": 364,
+                "y": 91
+            },
+            "end": {
+                "x": 364,
+                "y": 273
+            }
+        },
+        {
+            "start": {
+                "x": 364,
+                "y": 273
+            },
+            "end": {
+                "x": 91,
+                "y": 273
+            }
+        },
+        {
+            "start": {
+                "x": 546,
+                "y": 91
             },
             "end": {
                 "x": 546,
@@ -92,42 +72,42 @@
         },
         {
             "start": {
-                "x": 546,
-                "y": 0
+                "x": 819,
+                "y": 273
             },
             "end": {
                 "x": 546,
-                "y": 455
+                "y": 273
             }
         },
         {
             "start": {
-                "x": 546,
+                "x": 819,
                 "y": 182
             },
             "end": {
-                "x": 819,
+                "x": 637,
                 "y": 182
             }
         },
         {
             "start": {
                 "x": 637,
-                "y": 182
+                "y": 91
             },
             "end": {
                 "x": 637,
-                "y": 0
+                "y": 273
             }
         },
         {
             "start": {
-                "x": 546,
+                "x": 364,
                 "y": 273
             },
             "end": {
-                "x": 819,
-                "y": 273
+                "x": 364,
+                "y": 455
             }
         }
     ],
@@ -135,30 +115,54 @@
         {
             "type": "window",
             "wallIndex": 0,
-            "dist": 182,
+            "dist": 227,
             "width": 160
         },
         {
             "type": "window",
-            "wallIndex": 5,
-            "dist": 227,
-            "width": 70
+            "wallIndex": 0,
+            "dist": 682,
+            "width": 160
         },
         {
             "type": "window",
-            "wallIndex": 5,
-            "dist": 600,
+            "wallIndex": 2,
+            "dist": 136,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 2,
+            "dist": 409,
+            "width": 160
+        },
+        {
+            "type": "window",
+            "wallIndex": 2,
+            "dist": 637,
             "width": 160
         },
         {
             "type": "door",
-            "wallIndex": 6,
-            "dist": 100,
+            "wallIndex": 4,
+            "dist": 91,
             "width": 80
         },
         {
             "type": "door",
-            "wallIndex": 12,
+            "wallIndex": 6,
+            "dist": 91,
+            "width": 80
+        },
+        {
+            "type": "door",
+            "wallIndex": 6,
+            "dist": 364,
+            "width": 80
+        },
+        {
+            "type": "door",
+            "wallIndex": 7,
             "dist": 136,
             "width": 80
         }
@@ -167,7 +171,7 @@
         {
             "type": "stairs",
             "x": 455,
-            "y": 91,
+            "y": 136,
             "width": 91,
             "depth": 182,
             "rotation": 0,
@@ -175,17 +179,26 @@
         },
         {
             "type": "kitchen",
-            "x": 100,
-            "y": 100,
+            "x": 182,
+            "y": 364,
             "width": 255,
             "depth": 65,
-            "rotation": 90,
+            "rotation": 0,
             "color": "#cccccc"
         },
         {
+            "type": "table",
+            "x": 182,
+            "y": 200,
+            "width": 120,
+            "depth": 80,
+            "rotation": 0,
+            "color": "#8b4513"
+        },
+        {
             "type": "bath",
-            "x": 600,
-            "y": 91,
+            "x": 728,
+            "y": 136,
             "width": 160,
             "depth": 160,
             "rotation": 0,
@@ -193,8 +206,8 @@
         },
         {
             "type": "toilet",
-            "x": 600,
-            "y": 227,
+            "x": 591,
+            "y": 364,
             "width": 40,
             "depth": 70,
             "rotation": 0,
