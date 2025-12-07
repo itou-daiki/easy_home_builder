@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Home Builder</title>
+    <!-- Font for better UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <h1>Home Builder</h1>
+            
+            <section id="project-section">
+                <h2>Projects</h2>
+                <select id="project-select">
+                    <option value="" disabled selected>Select a project...</option>
+                </select>
+            </section>
+
+            <section id="tools-section">
+                <h2>Tools</h2>
+                <div class="tool-group">
+                    <button id="tool-wall" class="tool-btn active" title="Draw walls">📏 Wall</button>
+                    <button id="tool-select" class="tool-btn" title="Select/Move">👆 Select</button>
+                </div>
+                
+                <h3>Furniture</h3>
+                <div id="furniture-list">
+                    <button class="furniture-item" data-type="bed">🛏️ Bed</button>
+                    <button class="furniture-item" data-type="table">🪑 Table</button>
+                    <button class="furniture-item" data-type="sofa">🛋️ Sofa</button>
+                </div>
+            </section>
+
+             <section id="controls-section">
+                 <h2>View Mode</h2>
+                 <div class="toggle-container">
+                    <button id="mode-2d" class="mode-btn active">2D Plan</button>
+                    <button id="mode-3d" class="mode-btn">3D View</button>
+                 </div>
+             </section>
+             
+             <div class="help-text">
+                 <p><strong>Tips:</strong></p>
+                 <ul id="help-list">
+                     <li>Click points to draw walls.</li>
+                     <li>Drag furniture to place.</li>
+                 </ul>
+             </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main id="workspace">
+            <div id="container-2d">
+                <canvas id="canvas-2d"></canvas>
+            </div>
+            <div id="container-3d" style="display: none;"></div>
+        </main>
+    </div>
+
+    <!-- Main Logic -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>

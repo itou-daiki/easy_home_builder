@@ -1,0 +1,147 @@
+:root {
+    --bg-color: #f3f4f6;
+    --sidebar-bg: #ffffff;
+    --text-color: #1f2937;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --border-color: #e5e7eb;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    overflow: hidden; /* Prevent scroll on full app */
+}
+
+#app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+#sidebar {
+    width: 280px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    z-index: 10;
+}
+
+#sidebar h1 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+}
+
+#sidebar h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+#sidebar h3 {
+    font-size: 0.85rem;
+    margin: 10px 0 5px;
+}
+
+/* Tools */
+.tool-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tool-btn, .mode-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover, .mode-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.tool-btn.active, .mode-btn.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* Furniture List */
+#furniture-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.furniture-item {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: grab;
+    transition: background 0.2s;
+}
+
+.furniture-item:hover {
+    background: #f0fdfa;
+    border-color: var(--accent-color);
+}
+
+.furniture-item:active {
+    cursor: grabbing;
+}
+
+/* Help */
+.help-text {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #6b7280;
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+#help-list {
+    padding-left: 20px;
+    margin: 5px 0 0;
+}
+
+/* Workspace */
+#workspace {
+    flex: 1;
+    position: relative;
+    background: #e5e5e5; /* Canvas bg */
+    overflow: hidden;
+}
+
+#container-2d, #container-3d {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#canvas-2d {
+    display: block;
+    cursor: crosshair;
+}
